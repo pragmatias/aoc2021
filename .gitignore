@@ -1,2 +1,11 @@
+# build files
 *.class
 *.log
+
+# folder
+/.bsp
+/.metal
+/.vscode
+/target
+/project
+
