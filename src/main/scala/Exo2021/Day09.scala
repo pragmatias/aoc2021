@@ -10,41 +10,83 @@ class Day09 (inputData : String) {
     class Plateau(content : List[String]) {
         val lignes = inputList.size
         val colonnes = inputList(0).length
-        var tableau = Array.ofDim[(Int,Int)](lignes,colonnes)
+        var plateau = Array.ofDim[(Int,Int)](lignes,colonnes) //(heigh,adjacentHighPoint)
+        var bassins = Array.ofDim[(Int,Int)](lignes,colonnes) //(heigh,bassinID)
         for (i <- 0 until lignes) {
             for ( j <- 0 until colonnes) {
-                tableau(i)(j) = (content(i)(j).toString.toInt,0)
+                plateau(i)(j) = (content(i)(j).toString.toInt,0)
+                bassins(i)(j) = (content(i)(j).toString.toInt,0)
             }
         }
+        
 
         def majLowPoints() : Plateau = {
             for (i <- 0 until lignes) {
                 for ( j <- 0 until colonnes) {
-                    val up = (if ((i-1) >= 0) { tableau(i-1)(j)._1 } else {10})
-                    val down = (if ((i+1) < lignes) { tableau(i+1)(j)._1 } else {10})
-                    val left = (if ((j-1) >= 0) { tableau(i)(j-1)._1 } else {10})
-                    val right = (if ((j+1) < colonnes) { tableau(i)(j+1)._1 } else {10})
-                    val current = tableau(i)(j)._1
-                    var cpt = 0
-                    if (current >= up ) { cpt+=1 }
-                    if (current >= down ) { cpt+=1 }
-                    if (current >= left ) { cpt+=1 }
-                    if (current >= right ) { cpt+=1 }
-                    tableau(i)(j) = (current,cpt)
+                    plateau(i)(j) = (plateau(i)(j)._1,getHighPointsAdjacent(i,j))
                 }
             }
             return this
         }
 
+        def getHighPointsAdjacent(ligne:Int,colonne:Int) : Int = {
+            val listAdjacent = List((1,0),(-1,0),(0,1),(0,-1)).map(x => (x._1+ligne,x._2+colonne)).filter(x => x._1 >= 0 && x._1 < lignes && x._2 >= 0 && x._2 < colonnes)
+            return listAdjacent.map(x => plateau(x._1)(x._2)._1).filter(x => plateau(ligne)(colonne)._1 >= x).size
+        }
+
+        def simuleBassin(ligne:Int,colonne:Int,idBassin:Int) : Int = {
+            val currentElement = bassins(ligne)(colonne)
+            val listAdjacent = List((1,0),(-1,0),(0,1),(0,-1)).map(x => (x._1+ligne,x._2+colonne)).filter(x => currentElement._2 == 0 && currentElement._1 < 9).filter(x => x._1 >= 0 && x._1 < lignes && x._2 >= 0 && x._2 < colonnes)
+            val elementBassinsAdjacent = listAdjacent.map(x => ((x),bassins(x._1)(x._2))).filter({case (x,y) => (currentElement._1 <= y._1) || (currentElement._1 >= y._1) })
+            val listBassinID = elementBassinsAdjacent.map({case (coord,eltB) => eltB._2}).filter(_ > 0)
+            var bassinID = idBassin
+            if (listBassinID.size > 0) {
+                val bassinIDTmp = listBassinID.max
+                if (bassinIDTmp != bassinID && bassinIDTmp > 0) {
+                    bassinID = bassinIDTmp
+                }
+            } 
+            // maj bassins
+            if (elementBassinsAdjacent.size > 0) {
+                bassins(ligne)(colonne) = (currentElement._1,bassinID)
+            }
+            // maj adjacent bassins
+            elementBassinsAdjacent.foreach({ case (coord,_) => simuleBassin(coord._1,coord._2,bassinID)})
+            return elementBassinsAdjacent.size
+        }
+
+        def majBassins() : Plateau = {
+            var numBassin = 1
+            for (i <- 0 until lignes) {
+                for ( j <- 0 until colonnes) {
+                    val nbrBassinSimule = simuleBassin(i,j,numBassin)
+                    if (nbrBassinSimule != 0) { numBassin += 1 }
+                }
+            }
+            return this
+        }
+
+        def countBassins() : Long = {
+            return bassins.flatMap(x => x.filter(_._2 > 0)).groupBy(_._2).map(x => x._2.size.toLong).toSeq.sortWith(_ > _ ).take(3).foldLeft(1L)(_*_)
+        }
 
         def countLowPoints() : Int = {
-            return tableau.flatMap(x => x.filter(_._2 == 0).map( _._1 + 1)).sum
+            return plateau.flatMap(x => x.filter(_._2 == 0).map( _._1 + 1)).sum
         }
 
         def affichePlateau() : Unit =  {
             for (i <- 0 until lignes) {
                 for ( j<- 0 until colonnes) {
-                    print(tableau(i)(j))
+                    print(plateau(i)(j))
+                }
+                println()
+            }
+        }
+
+       def afficheBassins() : Unit =  {
+            for (i <- 0 until lignes) {
+                for ( j<- 0 until colonnes) {
+                    print(bassins(i)(j))
                 }
                 println()
             }
@@ -60,8 +102,10 @@ class Day09 (inputData : String) {
     }
 
 
-    def resultExoP2() : Int = {
-        return 0
+    def resultExoP2() : Long = {
+        val plat = new Plateau(inputList).majBassins()
+        //plat.afficheBassins
+        return plat.countBassins
     }
 
 }
