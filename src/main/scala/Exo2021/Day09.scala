@@ -26,10 +26,10 @@ class Day09 (inputData : String) {
                     val right = (if ((j+1) < colonnes) { tableau(i)(j+1)._1 } else {10})
                     val current = tableau(i)(j)._1
                     var cpt = 0
-                    if (current > up ) { cpt+=1 }
-                    if (current > down ) { cpt+=1 }
-                    if (current > left ) { cpt+=1 }
-                    if (current > right ) { cpt+=1 }
+                    if (current >= up ) { cpt+=1 }
+                    if (current >= down ) { cpt+=1 }
+                    if (current >= left ) { cpt+=1 }
+                    if (current >= right ) { cpt+=1 }
                     tableau(i)(j) = (current,cpt)
                 }
             }
@@ -69,7 +69,7 @@ class Day09 (inputData : String) {
 
 object Day09 extends App {
     
-    val data = "data/day09_input_test.txt"
+    val data = "data/day09_input.txt"
     val exo = new Day09(data) 
     
     println(s"Exercice Day 09 : [${exo.resultExo}]")
