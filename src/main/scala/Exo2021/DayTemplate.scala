@@ -22,7 +22,7 @@ class DayXX (inputData : String) {
 
 object DayXX extends App {
     
-    val data = "data/dayXX_input.txt"
+    val data = "data/dayXX_input_test.txt"
     val exo = new DayXX(data) 
     
     println(s"Exercice Day XX : [${exo.resultExo}]")
