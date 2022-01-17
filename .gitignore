@@ -3,7 +3,9 @@
 *.log
 
 # folder
+/.bloop
 /.bsp
+/.idea
 /.metals
 /.vscode
 /target
