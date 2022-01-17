@@ -5,7 +5,7 @@ import fr.pragmatias.Tools
 
 class DayXX (inputData : String) {
   
-    val inputList : List[(String)] = new Tools.FileInput(this.inputData).listContent.filterNot(_.trim.isEmpty)
+    val inputList : List[String] = new Tools.FileInput(this.inputData).listContent.filterNot(_.trim.isEmpty)
 
 
     def resultExo() : Int = {
@@ -23,7 +23,7 @@ class DayXX (inputData : String) {
 object DayXX extends App {
     
     val data = "data/dayXX_input_test.txt"
-    val exo = new DayXX(data) 
+    val exo = new Day20(data)
     
     println(s"Exercice Day XX : [${exo.resultExo}]")
     println(s"Exercice Day XX Part2 : [${exo.resultExoP2}]")
